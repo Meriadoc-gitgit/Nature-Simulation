@@ -102,13 +102,16 @@ public class Simulation {
             if (ter.getCase(p.x,p.y)!=null) {
                 if (p.energie<0 || ter.getCase(p.x,p.y).type=="Champignon") {
                     ter.getCase(p.x,p.y).setQuantite(Simulation.temp_repousse_cepe);
-                    proie.remove(p);
+                    p = null;
                     Proie.reduceAnimaux();
                     System.out.println(p.toString()+" est mort de champignon!");
                 }
                 else continue;
             }
         }
+        
+        /* Etape complementaire */
+        proie.refresh();
 
         /* Etape 3 : Reproduction */
         proie.reproduce();
@@ -126,7 +129,7 @@ public class Simulation {
                 for (Proie tmp : proie) {
                     if (p.x==tmp.x && p.y==tmp.y) {
                         p.setEnergie(p.energie + tmp.energie);
-                        proie.remove(tmp);
+                        tmp = null;
                         Proie.reduceAnimaux();
                         break;
                     }
@@ -148,13 +151,17 @@ public class Simulation {
             if (ter.getCase(p.x,p.y)!=null) {
                 if (p.energie<0 || ter.getCase(p.x,p.y).type=="Champignon" && ter.getCase(p.x,p.y)!=null) {
                     ter.getCase(p.x,p.y).setQuantite(Simulation.temp_repousse_cepe);
-                    pred.remove(p);
-                    Predateur.reduceAnimaux();
                     System.out.println(p.toString()+" est mort de champignon!");
+                    p = null;
+                    Predateur.reduceAnimaux();
                 }
                 else continue;
             }
         }
+
+        /* Etape complementaire */
+        pred.refresh();
+        proie.refresh();
 
         /* Etape 3 : reproduce les predateurs */
         pred.reproduce();
@@ -181,20 +188,28 @@ public class Simulation {
     public void rain() {
         for (int i=0;i<ter.nbLignes;i++) {
             for (int j=0;j<ter.nbColonnes;j++) {
-                if (ter.getCase(i,j).type == "Herbe" || ter.getCase(i,j).type == "Champignon" || ter.getCase(i,j).type == "Eau")
-                ter.getCase(i,j).setQuantite(
-                    ter.getCase(i,j).getQuantite()*2
-                );
+                if (ter.getCase(i,j)!=null) {
+                    if (ter.getCase(i,j).type == "Herbe" || ter.getCase(i,j).type == "Champignon" || ter.getCase(i,j).type == "Eau")
+                        ter.getCase(i,j).setQuantite(
+                            ter.getCase(i,j).getQuantite()*2
+                        );
+                    else continue;
+                }
+                else continue;
             }
         }
     }
     public void secheresse() {
         for (int i=0;i<ter.nbLignes;i++) {
             for (int j=0;j<ter.nbColonnes;j++) {
-                if (ter.getCase(i,j).type == "Herbe" || ter.getCase(i,j).type == "Champignon" || ter.getCase(i,j).type == "Eau")
-                ter.getCase(i,j).setQuantite(
-                    ter.getCase(i,j).getQuantite()/2
-                );
+                if (ter.getCase(i,j)!=null) {
+                    if (ter.getCase(i,j).type == "Herbe" || ter.getCase(i,j).type == "Champignon" || ter.getCase(i,j).type == "Eau")
+                        ter.getCase(i,j).setQuantite(
+                            ter.getCase(i,j).getQuantite()/2
+                        );
+                    else continue;
+                }
+                else continue;
             }
         }
     }

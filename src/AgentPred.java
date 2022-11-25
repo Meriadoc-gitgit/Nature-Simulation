@@ -21,6 +21,12 @@ public class AgentPred extends ArrayList<Predateur> implements Zoo {
             tmp.add(p.clone());
         return tmp;
     }
+    public void refresh() {
+        for (Predateur p : this) {
+            if (p == null)
+                this.remove(p);
+        }
+    }
 
     @Override
     public void bouger(Terrain t) {
@@ -33,7 +39,7 @@ public class AgentPred extends ArrayList<Predateur> implements Zoo {
     public void reproduce() {
         AgentPred tmp = this.clone();
         for (Predateur pred : tmp) {
-            if (Math.floor(Math.random())/Animaux.RAND_MAX < Animaux.p_reproduce_predateur) {
+            if (Math.floor(Math.random()*35000+32000)/Animaux.RAND_MAX < Animaux.p_reproduce_predateur) {
                 this.add(new Predateur(
                     pred.getX(), 
                     pred.getY()));
