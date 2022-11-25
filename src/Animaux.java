@@ -6,41 +6,44 @@
  * created : 20 Nov. 2022
  * 
  * Type : abstract class Animaux
- * Obj : stocker tous les variables, methods et constructeur necessaires pour l'heritage
+ * Obj : Stocker tous les variables, methods et constructeur necessaires pour l'heritage - Predateur et Proie
  * 
  */
 
-public class Animaux implements Action{
+public class Animaux implements Action {
     
     /* Final variables definition */
-    public final static double RAND_MAX = 32767;
-    public final static double p_reproduce_proie = 0.4;
-    public final static double p_reproduce_predateur = 0.5;
-    public final static int temp_repousse_herbe = -15;
+    public final static int RAND_MAX = 32767;
+    public final static double p_reproduce_predateur = .5;
+    public final static double p_reproduce_proie = .4;
 
-    /* Protected variables definition */
-    protected int x, y;
-    protected double energie;
-    protected int[] dir = new int[2];
+    /* Protected variables definition
+     * Seulement les classes filles peuvent y acceder
+     */
+    protected int x, y; /* Position de l'animal */
+    protected double energie; /* Energie de l'animal */
 
-    /* Constructeur to use for inherited class */
+    /* Constructeur (a utiliser pour les classes filles) */
     public Animaux(int x, int y, double energie) {
         this.x = x;
         this.y = y;
         this.energie = energie;
-        dir[0] = (int)Math.floor(Math.random()*3-1);
-        dir[1] = (int)Math.floor(Math.random()*3-1);
     }
 
-    /* Methodes pour tous les 2 types d'Animaux */
+    /* Methodes utiles pour la simulation des animaux */
     @Override
     public void seDeplacer(int xnew, int ynew) {
         x = xnew;
         y = ynew;
     }
     public double distance(int x, int y) {
-        return Math.sqrt((this.x + x)*(this.x + x) + (this.y + y)*(this.y + y));
+        return Math.sqrt((this.x - x)*(this.x - x) + (this.y - y)*(this.y - y));
     }
+    public double distance(Animaux a) {
+        return this.distance(a.getX(), a.getY());
+    }
+    
+    /* Ascenseur */
     public int getX() {
         return x;
     }
@@ -52,16 +55,5 @@ public class Animaux implements Action{
     }
     public void setEnergie(double e) {
         energie = e;
-    }
-    public String toString() {
-        return "Animal : Position : ["+x+","+y+"], Energie : "+energie+", Dir : ["+dir[0]+","+dir[1]+"]";
-    }
-
-
-
-
-    public static void main(String[] args) {
-
-        System.out.println(Animaux.temp_repousse_herbe);
     }
 }

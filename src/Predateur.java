@@ -5,8 +5,8 @@
  * Theme : Natural Simulation
  * created : 20 Nov. 2022
  * 
- * Type : abstract class Predateur extends Animaux
- * Obj : stocker tous les variables, methods et constructeur necessaires pour l'heritage de Carnivore
+ * Type : class Predateur extends Animaux
+ * Obj : Stocker tous les variables, methods et constructeur necessaires pour les Carnivore
  * 
  */
 
@@ -14,25 +14,33 @@ public class Predateur extends Animaux {
 
     /* Variables definition */
     private static int cpt = 0;
-    private String id = "";
+    public final int id;
 
     /* Constructeur */
-    public Predateur(int x, int y, double energie) {
-        super(x, y, energie);
-        id += cpt;
+    public Predateur(int x, int y, double e) {
+        super(x, y, e);
         cpt++;
+        id = cpt;
     }
     public Predateur(int x, int y) {
-        super(x, y, (int)Math.floor(Math.random()*101));
-        id += cpt;
+        super(x, y, Math.floor(Math.random()*100));
         cpt++;
+        id = cpt;
+    }
+    
+    /* Methods */
+    public String toString() {
+        return "Carnivore no."+cpt+" Position : ["+x+","+y+"] Energie : "+energie;
+    }
+    public Predateur clone() {
+        return new Predateur(this.x, this.y, this.energie);
     }
 
-    /* Methods */
+    /* Ascenseur */
     public static int getCpt() {
         return cpt;
     }
-    public String toString() {
-        return "Predateur no."+cpt+" Position : ["+x+","+y+"], Energie : "+energie+", Dir : ["+dir[0]+","+dir[1]+"]";
+    public static void reduceAnimaux() {
+        cpt--;
     }
 }

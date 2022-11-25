@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * @author Vu Hoang Thuy Duong
  * No.etudiant : 21110221 - TME7
@@ -5,41 +7,53 @@
  * Theme : Natural Simulation
  * created : 20 Nov. 2022
  * 
- * Type : class Agent, extends Animaux 
+ * Type : public class AgentPred extends ArrayList<Predateur> implements Zoo
  * Obj : Classe definie juste pour simplifier l'initialisation d'un ArrayList AgentPred de Predateur
  * 
  */
-import java.util.ArrayList;
 
-public class AgentPred extends ArrayList<Predateur> { 
-    /* Constructeur sans argument */
-
+public class AgentPred extends ArrayList<Predateur> implements Zoo {
+    
     /* Methods */
+    public AgentPred clone() {
+        AgentPred tmp = new AgentPred();
+        for (Predateur p : this) 
+            tmp.add(p.clone());
+        return tmp;
+    }
+
+    @Override
     public void bouger(Terrain t) {
-        for (int i=0;i<this.size();i++) {
-            this.get(i).seDeplacer((int)Math.floor(Math.random()%t.nbLignes), (int)Math.floor(Math.random()%t.nbColonnes));
+        for (Predateur pred : this) {
+            pred.seDeplacer(
+                (int)Math.floor(Math.random()*t.nbLignes), 
+                (int)Math.floor(Math.random()*t.nbColonnes));
         }
     }
-    public void reproduce(double p_reproduce) {
-        for (int i=0;i<this.size();i++) {
-            if (Math.floor(Math.random())/Animaux.RAND_MAX < p_reproduce) {
-                this.add(new Predateur(this.get(i).getX(), this.get(i).getY(), this.get(i).getEnergie()/2));
-                this.get(i).setEnergie(this.get(i).getX()/2);
+    public void reproduce() {
+        AgentPred tmp = this.clone();
+        for (Predateur pred : tmp) {
+            if (Math.floor(Math.random())/Animaux.RAND_MAX < Animaux.p_reproduce_predateur) {
+                this.add(new Predateur(
+                    pred.getX(), 
+                    pred.getY()));
+
+                pred.setEnergie(pred.getEnergie()/2);
             }
-            else continue;
         }
     }
-    public Predateur animal_en_XY(int x, int y) {
-        for (int i=0;i<this.size();i++) {
-            if (this.get(i).getX()==x && this.get(i).getY()==y)
-                return this.get(i);
+    public boolean animal_en_XY(int x, int y) {
+        for (Predateur pred : this) {
+            if (pred.getX()==x && pred.getY()==y) 
+                return true;
         }
-        return null;
+        return false;
     }
     public String toString() {
         String s = "";
-        for (Predateur p : this) 
-            s+=p.toString()+"\n";
+        for (Predateur pred : this) {
+            s += pred.toString()+"\n";
+        }
         return s;
     }
 }
