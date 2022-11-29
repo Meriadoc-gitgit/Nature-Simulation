@@ -40,7 +40,4 @@ public class Proie extends Animaux {
     public static int getCpt() {
         return cpt;
     }
-    public static void reduceAnimaux() {
-        cpt--;
-    }
 }

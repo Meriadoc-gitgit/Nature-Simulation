@@ -5,7 +5,7 @@
  * Theme : Natural Simulation
  * created : 20 Nov. 2022
  * 
- * Type : abstract class Animaux
+ * Type : class Animaux implements Action
  * Obj : Stocker tous les variables, methods et constructeur necessaires pour l'heritage - Predateur et Proie
  * 
  */

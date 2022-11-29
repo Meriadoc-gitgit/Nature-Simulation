@@ -10,20 +10,7 @@
  * 
  */
 
-public class Simulation {
-
-    /* Final variables definition */
-    public static final int temp_repousse_herbe = -15;
-    public static final int temp_repousse_cepe = -5;
-    
-    /* Variables definition */
-    private Terrain ter;
-    private Ressource[] res;
-    private AgentPred pred = new AgentPred();
-    private AgentProie proie = new AgentProie();
-
-    /* Tableau de Ressource */
-    private String[] surround = {"Arbre", "Herbe", "Champignon", "Eau"};
+public class Simulation extends Stock {
 
     /* Constructeur */
     public Simulation(int m, int n) {
@@ -33,44 +20,7 @@ public class Simulation {
          * m ressources
          * n agents
          */
-        this.ter = new Terrain();
-
-        /* Initialisation de m ressources */
-        this.res = new Ressource[m];
-        for (int i=0;i<res.length;i++) {
-            res[i] = new Ressource (
-                surround[(int)Math.floor(Math.random()*surround.length)], 
-                (int)Math.floor(Math.random()*100)   
-            );
-
-            ter.setCase(
-                (int)Math.floor(Math.random()*ter.nbLignes),
-                (int)Math.floor(Math.random()*ter.nbColonnes),
-                res[i]
-            );
-        }
-
-        /* Initialisation de n agents */
-        /* Regle : 
-         * Si n%2==0 alors nbPredateur > nbProie
-         * Sinon alors nbPredateur == nbProie
-         */
-        int len = n;
-        if (n%2==0) len/=2;
-        else len = len/2 + 1;
-        for(int i=0;i<(int)len;i++) {
-            proie.add(new Proie(
-                (int)Math.floor(Math.random()*ter.nbLignes),
-                (int)Math.floor(Math.random()*ter.nbColonnes))
-            );
-            
-            if (proie.size()+pred.size() == n) break;
-
-            pred.add(new Predateur(
-                (int)Math.floor(Math.random()*ter.nbLignes),
-                (int)Math.floor(Math.random()*ter.nbColonnes))
-            );
-        }
+        super(m,n);
     }
 
     /* Methods (pour les animaux) */
@@ -98,20 +48,33 @@ public class Simulation {
 
             else p.setEnergie(p.energie-1);
 
+            if (p.energie<0) {
+                p.setEnergie(-100);
+            }
+
             /* Au cas ou l'energie est negative */
-            if (ter.getCase(p.x,p.y)!=null) {
-                if (p.energie<0 || ter.getCase(p.x,p.y).type=="Champignon") {
-                    ter.getCase(p.x,p.y).setQuantite(Simulation.temp_repousse_cepe);
-                    p = null;
-                    Proie.reduceAnimaux();
-                    System.out.println(p.toString()+" est mort de champignon!");
+            if (p != null) {
+                if (ter.getCase(p.x,p.y)!=null) {
+                    if (ter.getCase(p.x,p.y).type=="Champignon") {
+                        ter.getCase(p.x,p.y).setQuantite(Simulation.temp_repousse_cepe);
+                        System.out.println(p.toString()+" est mort de champignon!");
+                        p.setEnergie(-100);
+                    }
+                    else continue;
                 }
-                else continue;
             }
         }
-        
-        /* Etape complementaire */
-        proie.refresh();
+
+        /* Refresh proie (remove null) */
+        int s = 0;
+        AgentProie tmp = proie.clone();
+        for (Proie p : tmp) {
+            if (p.getEnergie()<0) {
+                proie.remove(s);
+                s--;
+            }
+            s++;
+        }
 
         /* Etape 3 : Reproduction */
         proie.reproduce();
@@ -129,8 +92,7 @@ public class Simulation {
                 for (Proie tmp : proie) {
                     if (p.x==tmp.x && p.y==tmp.y) {
                         p.setEnergie(p.energie + tmp.energie);
-                        tmp = null;
-                        Proie.reduceAnimaux();
+                        tmp.setEnergie(-100);
                         break;
                     }
                 }
@@ -146,23 +108,44 @@ public class Simulation {
             }
             
             else p.setEnergie(p.energie-1);
+            
+            if (p.energie < 0) {
+                p = null;
+            }
 
             /* Au cas ou l'energie est negative */
-            if (ter.getCase(p.x,p.y)!=null) {
-                if (p.energie<0 || ter.getCase(p.x,p.y).type=="Champignon" && ter.getCase(p.x,p.y)!=null) {
-                    ter.getCase(p.x,p.y).setQuantite(Simulation.temp_repousse_cepe);
-                    System.out.println(p.toString()+" est mort de champignon!");
-                    p = null;
-                    Predateur.reduceAnimaux();
+            if (p != null) {
+                if (ter.getCase(p.x,p.y)!=null) {
+                    if (ter.getCase(p.x,p.y).type=="Champignon" && ter.getCase(p.x,p.y)!=null) {
+                        ter.getCase(p.x,p.y).setQuantite(Simulation.temp_repousse_cepe);
+                        System.out.println(p.toString()+" est mort de champignon!");
+                        p.setEnergie(-100);
+                    }
+                    else continue;
                 }
-                else continue;
             }
         }
 
-        /* Etape complementaire */
-        pred.refresh();
-        proie.refresh();
+        /* Refresh proie (remove null) */
+        int s = 0;
+        AgentProie tmp = proie.clone();
+        for (Proie p : tmp) {
+            if (p.getEnergie()<0) {
+                proie.remove(s);
+                s--;
+            }
+            s++;
+        }
 
+        s = 0;
+        AgentPred tmp2 = pred.clone();
+        for (Predateur p : tmp2) {
+            if (p.getEnergie()<0) {
+                pred.remove(s);
+                s--;
+            }
+            s++;
+        }
         /* Etape 3 : reproduce les predateurs */
         pred.reproduce();
     }
@@ -186,6 +169,7 @@ public class Simulation {
 
     /* Methods (pour la meteo) */
     public void rain() {
+        System.out.println("Il pleut!\n");
         for (int i=0;i<ter.nbLignes;i++) {
             for (int j=0;j<ter.nbColonnes;j++) {
                 if (ter.getCase(i,j)!=null) {
@@ -200,6 +184,7 @@ public class Simulation {
         }
     }
     public void secheresse() {
+        System.out.println("La secheresse!!!");
         for (int i=0;i<ter.nbLignes;i++) {
             for (int j=0;j<ter.nbColonnes;j++) {
                 if (ter.getCase(i,j)!=null) {
@@ -212,7 +197,15 @@ public class Simulation {
                 else continue;
             }
         }
+
+        /* Baisser l'energie des animaux */
+        for (Predateur p : pred)
+            p.energie--;
+        for (Proie p : proie)
+            p.energie--;
     }
+
+    
     /* AFFICHAGE DE SIMULATION */
     public String toString() {
         String s = "";
@@ -264,8 +257,8 @@ public class Simulation {
         s += "|\n\n";
 
         /* Compteur d'animaux */
-        s += "Nombre de Proie : "+Proie.getCpt()+"\n";
-        s += "Nombre de Predateur : "+Predateur.getCpt()+"\n\n";
+        s += "Nombre de Proie : "+proie.size()+"\n";
+        s += "Nombre de Predateur : "+pred.size()+"\n\n";
 
         /* Notation pour les signes */
         s += "@ : Predateur + Proie\n";

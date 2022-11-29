@@ -15,6 +15,7 @@ public interface Zoo {
     /* Methods */
     public void bouger(Terrain t);
     public void reproduce();
-
+    public String toString();
+    public boolean animal_en_XY(int x, int y);
     /* Methods animal_en_XY et clone va etre defini dans chanque fichier independant */
 }
